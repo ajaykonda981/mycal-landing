@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Cal — AI Calorie Tracker</title>
+<meta name="description" content="Snap a photo of your meal and let AI log the calories and macros. Track water, sleep and weight too. Free to start, on Android.">
+<link rel="icon" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;0,9..144,680;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<meta property="og:title" content="My Cal — AI Calorie Tracker">
+<meta property="og:description" content="Snap a photo of your meal. AI logs the calories and macros. Track water, sleep and weight too.">
+<meta property="og:image" content="assets/home.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
+<style>
+  :root{
+    --bg:#FAF7EF;
+    --surface:#FFFFFF;
+    --fg:#132019;
+    --fg-muted:#5C6B60;
+    --accent:#1F6F4A;
+    --accent-soft:#E6F1E9;
+    --premium:#B3791A;
+    --premium-soft:#FBF0D9;
+    --border:#E6E0D1;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Inter', -apple-system, system-ui, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1512; --surface:#17201B; --fg:#EFEDE2; --fg-muted:#9BAB9F;
+      --accent:#55B583; --accent-soft:#1B2B21; --premium:#E3B152; --premium-soft:#2A2110;
+      --border:#283028; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1512; --surface:#17201B; --fg:#EFEDE2; --fg-muted:#9BAB9F;
+    --accent:#55B583; --accent-soft:#1B2B21; --premium:#E3B152; --premium-soft:#2A2110;
+    --border:#283028; color-scheme: dark;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--fg); font-family:var(--body);
+    padding-left:max(16px, env(safe-area-inset-left,0px));
+    padding-right:max(16px, env(safe-area-inset-right,0px));
+  }
+  h1,h2,h3{ font-family:var(--display); font-weight:680; letter-spacing:-0.01em; margin:0; text-wrap:balance; }
+  p{ margin:0; }
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; }
+  .wrap{ max-width:1100px; margin:0 auto; }
+
+  /* ---- Nav ---- */
+  nav{
+    position:sticky; top:0; z-index:40; backdrop-filter:blur(10px);
+    background:color-mix(in srgb, var(--bg) 86%, transparent);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{ max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:14px 0; }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:680; font-size:1.05rem; }
+  .brand img{ width:30px; height:30px; border-radius:8px; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; font-weight:700; font-size:.88rem;
+    padding:10px 18px; border-radius:999px; text-decoration:none; white-space:nowrap;
+    background:var(--accent); color:#fff; border:1px solid transparent;
+  }
+  .btn.ghost{ background:transparent; color:var(--fg); border-color:var(--border); }
+
+  /* ---- Hero ---- */
+  .hero{
+    padding: clamp(50px,9vw,96px) 0 clamp(30px,6vw,50px);
+    display:flex; align-items:center; gap:clamp(30px,5vw,70px); flex-wrap:wrap;
+  }
+  .hero-copy{ flex:1 1 380px; display:flex; flex-direction:column; gap:18px; }
+  .eyebrow{ font-size:.75rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+  .hero h1{ font-size:clamp(2.1rem, 5vw, 3.4rem); max-width:14ch; }
+  .hero-sub{ font-size:clamp(1rem,1.6vw,1.15rem); color:var(--fg-muted); max-width:44ch; line-height:1.6; }
+  .hero-ctas{ display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
+  .hero-note{ font-size:.82rem; color:var(--fg-muted); }
+  .hero-phone{ flex:0 0 auto; width:min(260px, 72vw); margin:0 auto; }
+  .phone{
+    border-radius:30px; border:7px solid var(--surface); background:var(--surface);
+    box-shadow:0 26px 56px -20px rgba(10,30,20,.35), 0 2px 8px rgba(10,30,20,.08);
+    overflow:hidden; outline:1px solid var(--border);
+  }
+
+  /* ---- Trust row ---- */
+  .trust{ display:flex; gap:28px; flex-wrap:wrap; padding:18px 0 46px; color:var(--fg-muted); font-size:.86rem; }
+  .trust span{ display:flex; align-items:center; gap:7px; }
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block; }
+
+  /* ---- How it works ---- */
+  section{ padding:clamp(40px,7vw,76px) 0; border-top:1px solid var(--border); }
+  .section-head{ max-width:56ch; margin-bottom:clamp(28px,4vw,42px); }
+  .section-head h2{ font-size:clamp(1.5rem,3vw,2.1rem); margin-bottom:10px; }
+  .section-head p{ color:var(--fg-muted); line-height:1.6; font-size:1rem; }
+
+  .how{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  @media (max-width:860px){ .how{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .how{ grid-template-columns:1fr; } }
+  .how-card{ background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:22px; display:flex; flex-direction:column; gap:10px; }
+  .how-num{ font-family:var(--display); font-weight:680; color:var(--accent); font-size:1.1rem; }
+  .how-card h3{ font-size:1.05rem; }
+  .how-card p{ color:var(--fg-muted); font-size:.92rem; line-height:1.55; }
+
+  /* ---- Gallery ---- */
+  .gallery{ display:grid; grid-template-columns:repeat(6,1fr); gap:16px; }
+  @media (max-width:900px){ .gallery{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:560px){ .gallery{ grid-template-columns:repeat(2,1fr); } }
+  .gallery .phone{ border-width:5px; border-radius:22px; }
+  .gallery figure{ margin:0; display:flex; flex-direction:column; gap:8px; }
+  .gallery figcaption{ font-size:.78rem; color:var(--fg-muted); text-align:center; }
+
+  /* ---- Feature strip (AI multi-item) ---- */
+  .feature-strip{
+    display:flex; align-items:center; gap:clamp(28px,5vw,60px); flex-wrap:wrap-reverse;
+  }
+  .feature-strip .media{ flex:0 0 auto; display:flex; gap:14px; width:min(360px,80vw); }
+  .feature-strip .media .phone{ flex:1; }
+  .feature-strip .copy{ flex:1 1 320px; display:flex; flex-direction:column; gap:12px; }
+  .feature-strip .copy h2{ font-size:clamp(1.4rem,2.8vw,2rem); }
+  .feature-strip .copy p{ color:var(--fg-muted); line-height:1.6; max-width:46ch; }
+
+  /* ---- Premium ---- */
+  .premium-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:24px;
+    padding:clamp(24px,4vw,40px); display:flex; gap:clamp(24px,5vw,56px); align-items:center; flex-wrap:wrap;
+  }
+  .premium-card .phone{ flex:0 0 auto; width:min(220px,70vw); }
+  .premium-copy{ flex:1 1 320px; display:flex; flex-direction:column; gap:14px; }
+  .premium-pill{ align-self:flex-start; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    background:var(--premium-soft); color:var(--premium); padding:5px 12px; border-radius:999px; border:1px solid color-mix(in srgb, var(--premium) 30%, transparent); }
+  .premium-copy h2{ font-size:clamp(1.4rem,2.8vw,1.9rem); }
+  .premium-copy p{ color:var(--fg-muted); line-height:1.6; max-width:46ch; }
+  .price-row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:4px; }
+  .price{ border:1px solid var(--border); border-radius:14px; padding:14px 18px; min-width:160px; }
+  .price.best{ border-color:var(--premium); background:var(--premium-soft); }
+  .price .amt{ font-family:var(--display); font-weight:680; font-size:1.4rem; }
+  .price .per{ font-size:.78rem; color:var(--fg-muted); }
+  .price .tag{ font-size:.7rem; font-weight:700; color:var(--premium); text-transform:uppercase; letter-spacing:.04em; }
+
+  /* ---- Founder ---- */
+  .founder{ display:flex; gap:clamp(28px,5vw,56px); align-items:flex-start; flex-wrap:wrap; }
+  .founder-avatar{
+    flex:0 0 auto; width:84px; height:84px; border-radius:50%; background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:680;
+    font-size:1.7rem; color:var(--accent); border:1px solid var(--border);
+  }
+  .founder-copy{ flex:1 1 420px; display:flex; flex-direction:column; gap:14px; }
+  .founder-copy h2{ font-size:clamp(1.4rem,2.8vw,1.9rem); }
+  .founder-copy p{ color:var(--fg-muted); line-height:1.7; max-width:62ch; font-size:.98rem; }
+  .founder-name{ font-weight:700; color:var(--fg); font-size:.98rem; }
+  .founder-role{ color:var(--fg-muted); font-size:.85rem; }
+  .founder-links{ display:flex; gap:10px; flex-wrap:wrap; margin-top:4px; }
+  .founder-links a{ font-size:.85rem; font-weight:600; color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+
+  /* ---- CTA band ---- */
+  .cta-band{
+    border-top:1px solid var(--border);
+    background:var(--accent); color:#fff;
+    padding:clamp(44px,7vw,70px) 0;
+  }
+  .cta-band .wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+  .cta-band h2{ color:#fff; font-size:clamp(1.4rem,3vw,2rem); max-width:18ch; }
+  .cta-band p{ color:#DCEFE1; max-width:40ch; margin-top:8px; line-height:1.55; }
+  .cta-band .btn{ background:#fff; color:var(--accent); }
+
+  footer{ padding:28px 0 40px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--fg-muted); font-size:.82rem; }
+  footer a{ text-decoration:none; color:var(--fg-muted); }
+  footer a:hover{ color:var(--fg); }
+  .foot-links{ display:flex; gap:16px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/icon.png" alt="My Cal logo"> My Cal</div>
+    <a class="btn" href="https://play.google.com/store/apps/details?id=mycal.aifitnesstracker.ai" target="_blank" rel="noopener">Get it on Google Play</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">AI Calorie &amp; Fitness Tracker</div>
+      <h1>AI logs your calories. You just eat.</h1>
+      <p class="hero-sub">Photograph your meal and My Cal works out the calories and macros for you. Track water, sleep and weight alongside it — all explained in plain English, not charts you need a translator for.</p>
+      <div class="hero-ctas">
+        <a class="btn" href="https://play.google.com/store/apps/details?id=mycal.aifitnesstracker.ai" target="_blank" rel="noopener">Download for Android</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <div class="hero-note">Free to start · English &amp; Telugu · No credit card required</div>
+    </div>
+    <div class="hero-phone">
+      <div class="phone"><img src="assets/home.jpg" alt="My Cal home screen"></div>
+    </div>
+  </div>
+
+  <div class="trust">
+    <span><i class="dot"></i> Live on Google Play</span>
+    <span><i class="dot"></i> Built for real daily use, not a demo</span>
+    <span><i class="dot"></i> AI-powered, human-checked</span>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>How it works</h2>
+      <p>No search bars, no barcode scanning, no guessing portion sizes. Point your camera at your plate and let the AI do the counting.</p>
+    </div>
+    <div class="how">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <h3>Snap a photo</h3>
+        <p>Of your meal, your water glass, or just type what you ate.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <h3>AI reads it</h3>
+        <p>Calories, protein, carbs, fat and fibre worked out automatically — even for multi-item plates.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <h3>See your day</h3>
+        <p>One dashboard for food, water, sleep and weight, explained in plain English.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">04</div>
+        <h3>Stay on track</h3>
+        <p>Get nudged when you're over target, and a weekly AI review of how the week went.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Every part of the day, in one app</h2>
+      <p>The screens that make up a normal day with My Cal.</p>
+    </div>
+    <div class="gallery">
+      <figure><div class="phone"><img src="assets/signin.jpg" alt="Sign in screen"></div><figcaption>Sign in</figcaption></figure>
+      <figure><div class="phone"><img src="assets/snap.jpg" alt="AI analyzing a meal photo"></div><figcaption>Snap a meal</figcaption></figure>
+      <figure><div class="phone"><img src="assets/breakdown.jpg" alt="Calorie and macro breakdown"></div><figcaption>Instant breakdown</figcaption></figure>
+      <figure><div class="phone"><img src="assets/water.jpg" alt="Water tracker"></div><figcaption>Water</figcaption></figure>
+      <figure><div class="phone"><img src="assets/sleep.jpg" alt="Sleep tracker"></div><figcaption>Sleep</figcaption></figure>
+      <figure><div class="phone"><img src="assets/weight.jpg" alt="Weight tracker"></div><figcaption>Weight</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="feature-strip">
+      <div class="media">
+        <div class="phone"><img src="assets/plate1.jpg" alt="AI analyzing a full plate of biryani"></div>
+        <div class="phone"><img src="assets/plate2.jpg" alt="AI found three items: biryani, raita and salan"></div>
+      </div>
+      <div class="copy">
+        <div class="eyebrow">One photo, every item</div>
+        <h2>A thali isn't one food. My Cal knows that.</h2>
+        <p>Point the camera at a full plate and the AI separates it into each item — mutton biryani, raita, salan — with calories and macros itemized for every one, ready to correct with a tap if anything looks off.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Go further with Premium</h2>
+      <p>The free plan is enough to try My Cal properly. Premium is for using it every day.</p>
+    </div>
+    <div class="premium-card">
+      <div class="phone"><img src="assets/paywall.jpg" alt="Premium pricing screen"></div>
+      <div class="premium-copy">
+        <span class="premium-pill">Premium</span>
+        <h2>25 AI entries a day, not 5 for life</h2>
+        <p>Premium resets your AI entries and photo scans every single day, unlocks a 6-day cuisine-aware AI meal plan with a shopping list, and a weekly AI review of how your week went.</p>
+        <div class="price-row">
+          <div class="price best">
+            <div class="tag">Best value · Save 33%</div>
+            <div class="amt">₹166.58<span style="font-size:.95rem;font-weight:600">/mo</span></div>
+            <div class="per">Billed ₹1,999 annually</div>
+          </div>
+          <div class="price">
+            <div class="amt">₹249<span style="font-size:.95rem;font-weight:600">/mo</span></div>
+            <div class="per">Billed monthly, cancel anytime</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="founder">
+      <div class="founder-avatar">AK</div>
+      <div class="founder-copy">
+        <div class="eyebrow">Why I built this</div>
+        <h2>Built for myself, because I needed it</h2>
+        <p>"I used to be an active cricket player, but somewhere along the way I lost my discipline and gained weight from unhealthy food habits. I wanted an app that tracked calories, protein, carbs, fats, sleep, steps and water — but explained it in plain English instead of a wall of charts I'd have to decode. So I built My Cal for myself first, and it's now live on Google Play for anyone trying to get back on track too."</p>
+        <div>
+          <div class="founder-name">Ajay Konda</div>
+          <div class="founder-role">Lead AI Full Stack Developer · Forward Deployed Engineer</div>
+        </div>
+        <div class="founder-links">
+          <a href="https://www.linkedin.com/in/ajay-konda-889447191" target="_blank" rel="noopener">LinkedIn →</a>
+          <a href="https://github.com/ajaykonda981" target="_blank" rel="noopener">GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="cta-band">
+  <div class="wrap">
+    <div>
+      <h2>Stop guessing what you ate.</h2>
+      <p>Free to start. No credit card required to try it.</p>
+    </div>
+    <a class="btn" href="https://play.google.com/store/apps/details?id=mycal.aifitnesstracker.ai" target="_blank" rel="noopener">Get it on Google Play</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 My Cal AI Fitness Tracker. All rights reserved.</span>
+    <div class="foot-links">
+      <a href="https://my-cal---ai-fitness-tracker.web.app/privacy-policy.html" target="_blank" rel="noopener">Privacy</a>
+      <a href="https://my-cal---ai-fitness-tracker.web.app/terms.html" target="_blank" rel="noopener">Terms</a>
+      <a href="https://my-cal---ai-fitness-tracker.web.app/refund-policy.html" target="_blank" rel="noopener">Refund &amp; Cancellation</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
